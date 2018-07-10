@@ -1,10 +1,18 @@
 module Main where
     import Graphics.UI.Fungen
+    import Control.Concurrent
+    import Control.Concurrent.MVar
 
     data GameAttribute = Score Int | Ball (Int, Int)
     type PongObject = GameObject ()
     type PongAction a = IOGame GameAttribute () () () a
-    
+
+    addToScore :: MVar GameAttribute -> Int -> IO ()
+    addToScore currScore toAdd = do (Score c) <- takeMVar currScore
+                                    putMVar currScore (Score(c + 10))
+
+    i = newMVar (Score 0)
+
     main :: IO ()
     main = do 
       let winConfig = ((0, 0), (460, 460), "Arkanoid")
@@ -25,6 +33,9 @@ module Main where
     createBar = let barBound = [(-25, -6), (25, -6), (25, 6), (-25, 6)]
                     barPic = Basic (Polyg barBound 1.0 1.0 1.0 Filled)
                     in object "bar" barPic False (250, 30) (0,0) ()
+    
+    -- addScore :: Int -> Int -> IO ()
+    -- addScore init adder = forkIO(do setGameAttribute (Score (init + adder)))
   
     createTarget :: [PongObject]
     createTarget = 
